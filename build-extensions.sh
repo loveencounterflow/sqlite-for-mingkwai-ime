@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-
+mkdir -p extensions
 echo "building amatch.c      	" ; gcc -g -fPIC -shared -I. extension-sources/misc/amatch.c       -o extensions/amatch.so
 echo "building anycollseq.c  	" ; gcc -g -fPIC -shared -I. extension-sources/misc/anycollseq.c   -o extensions/anycollseq.so
 echo "building appendvfs.c   	" ; gcc -g -fPIC -shared -I. extension-sources/misc/appendvfs.c    -o extensions/appendvfs.so
