@@ -15,14 +15,14 @@
 /* #include "fts5Int.h" */
 
 /**************************************************************************
-** Start of ascii tokenizer implementation.
+** Start of asciics tokenizer implementation.
 */
 
 /*
 ** For tokenizers with no "unicode" modifier, the set of token characters
 ** is the same as the set of ASCII range alphanumeric characters.
 */
-static unsigned char aAsciiTokenChar[128] = {
+static unsigned char aAsciicsTokenChar[128] = {
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   /* 0x00..0x0F */
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   /* 0x10..0x1F */
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   /* 0x20..0x2F */
@@ -33,13 +33,13 @@ static unsigned char aAsciiTokenChar[128] = {
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 0, 0, 0, 0, 0,   /* 0x70..0x7F */
 };
 
-typedef struct AsciiTokenizer AsciiTokenizer;
-struct AsciiTokenizer {
+typedef struct AsciicsTokenizer AsciicsTokenizer;
+struct AsciicsTokenizer {
   unsigned char aTokenChar[128];
 };
 
-static void fts5AsciiAddExceptions(
-  AsciiTokenizer *p,
+static void fts5AsciicsAddExceptions(
+  AsciicsTokenizer *p,
   const char *zArg,
   int bTokenChars
 ){
@@ -52,46 +52,46 @@ static void fts5AsciiAddExceptions(
 }
 
 /*
-** Delete a "ascii" tokenizer.
+** Delete a "asciics" tokenizer.
 */
-static void fts5AsciiDelete(Fts5Tokenizer *p){
+static void fts5AsciicsDelete(Fts5Tokenizer *p){
   sqlite3_free(p);
 }
 
 /*
-** Create an "ascii" tokenizer.
+** Create an "asciics" tokenizer.
 */
-static int fts5AsciiCreate(
+static int fts5AsciicsCreate(
   void *pUnused,
   const char **azArg, int nArg,
   Fts5Tokenizer **ppOut
 ){
   int rc = SQLITE_OK;
-  AsciiTokenizer *p = 0;
+  AsciicsTokenizer *p = 0;
   UNUSED_PARAM(pUnused);
   if( nArg%2 ){
     rc = SQLITE_ERROR;
   }else{
-    p = sqlite3_malloc(sizeof(AsciiTokenizer));
+    p = sqlite3_malloc(sizeof(AsciicsTokenizer));
     if( p==0 ){
       rc = SQLITE_NOMEM;
     }else{
       int i;
-      memset(p, 0, sizeof(AsciiTokenizer));
-      memcpy(p->aTokenChar, aAsciiTokenChar, sizeof(aAsciiTokenChar));
+      memset(p, 0, sizeof(AsciicsTokenizer));
+      memcpy(p->aTokenChar, aAsciicsTokenChar, sizeof(aAsciicsTokenChar));
       for(i=0; rc==SQLITE_OK && i<nArg; i+=2){
         const char *zArg = azArg[i+1];
         if( 0==sqlite3_stricmp(azArg[i], "tokenchars") ){
-          fts5AsciiAddExceptions(p, zArg, 1);
+          fts5AsciicsAddExceptions(p, zArg, 1);
         }else
         if( 0==sqlite3_stricmp(azArg[i], "separators") ){
-          fts5AsciiAddExceptions(p, zArg, 0);
+          fts5AsciicsAddExceptions(p, zArg, 0);
         }else{
           rc = SQLITE_ERROR;
         }
       }
       if( rc!=SQLITE_OK ){
-        fts5AsciiDelete((Fts5Tokenizer*)p);
+        fts5AsciicsDelete((Fts5Tokenizer*)p);
         p = 0;
       }
     }
@@ -102,7 +102,7 @@ static int fts5AsciiCreate(
 }
 
 
-static void asciiFold(char *aOut, const char *aIn, int nByte){
+static void asciicsFold(char *aOut, const char *aIn, int nByte){
   int i;
   for(i=0; i<nByte; i++){
     char c = aIn[i];
@@ -112,16 +112,16 @@ static void asciiFold(char *aOut, const char *aIn, int nByte){
 }
 
 /*
-** Tokenize some text using the ascii tokenizer.
+** Tokenize some text using the asciics tokenizer.
 */
-static int fts5AsciiTokenize(
+static int fts5AsciicsTokenize(
   Fts5Tokenizer *pTokenizer,
   void *pCtx,
   int iUnused,
   const char *pText, int nText,
   int (*xToken)(void*, int, const char*, int nToken, int iStart, int iEnd)
 ){
-  AsciiTokenizer *p = (AsciiTokenizer*)pTokenizer;
+  AsciicsTokenizer *p = (AsciicsTokenizer*)pTokenizer;
   int rc = SQLITE_OK;
   int ie;
   int is = 0;
@@ -159,7 +159,7 @@ static int fts5AsciiTokenize(
       }
       nFold = nByte*2;
     }
-    asciiFold(pFold, &pText[is], nByte);
+    asciicsFold(pFold, &pText[is], nByte);
 
     /* Invoke the token callback */
     rc = xToken(pCtx, 0, pFold, nByte, is, ie);
