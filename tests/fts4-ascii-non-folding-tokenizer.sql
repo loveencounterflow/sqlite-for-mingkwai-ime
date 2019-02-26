@@ -100,6 +100,34 @@ insert into txfts ( txfts ) values ( 'rebuild' );
 
 select count(*) from txfts;
 
+-- ---------------------------------------------------------------------------------------------------------
+create table probes (
+    id        integer primary key,
+    probe     text unique not null
+  );
+
+-- ---------------------------------------------------------------------------------------------------------
+create table results (
+    probe_id  integer         not null,
+    result_id integer unique  not null,
+    result    text            not null
+  );
+
+-- ---------------------------------------------------------------------------------------------------------
+insert into probes ( probe ) values
+  ( 'alpha'   ),
+  ( 'Alpha'   ),
+  ( 'alpha*'  ),
+  ( 'Alpha*'  ),
+  ( '日本'      ),
+  ( '日本*'     );
+
+select * from probes;
+.load './extensions/series'
+select * from generate_series( 1, 10, 3 ) as n;
+
+.exit
+
 .print '============================================================================================================'
 select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match 'alpha' order by bm25( txfts );
 
