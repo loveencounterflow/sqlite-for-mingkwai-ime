@@ -16,89 +16,60 @@
 -- .tables
 -- .schema
 
--- drop table if exists customers;
--- CREATE VIRTUAL TABLE customers USING fts5(
---     name,
---     addr,
---     uuid UNINDEXED,
---     -- tokenize = 'unicode61 remove_diacritics 2'
---     tokenize = 'unicode61'
---     );
-
--- drop table if exists customers;
--- CREATE VIRTUAL TABLE customers USING fts5(a, b,
---     tokenize = "unicode61 categories 'L* N* Co Mn'"
--- );
--- xxx;
-
-
-
-
-
-/*
-drop table if exists foo;
-create table foo (
-  input   text not null,
-  output  text not null );
-
-insert into foo values
-  ( 1, 2 ),
-  ( 3, 4 ),
-  ( 5, 6 ),
-  ( 7, 8 ),
-  ( 9, 10 ),
-  ( 11, 12 ),
-  ( 13, 14 ),
-  -- ( 13, null ),
-  ( 15, 16 );
-
-select * from foo;
-*/
-
--- .show
--- .exit
-.print '--=(1)=--'
 drop table if exists texnames;
+drop table if exists txftsci;
+drop table if exists txftscs;
+
+
+-- ---------------------------------------------------------------------------------------------------------
+.print '--=(1)=--'
 .mode csv
 .import 'tests/texnames.csv' texnames
-
 .mode column
-select texname, cid_hex, glyph from texnames limit 10;
+-- select texname, cid_hex, glyph from texnames limit 10;
 select count(*) from texnames;
 
+-- ---------------------------------------------------------------------------------------------------------
 .print '--=(2)=--'
-drop table if exists txfts;
-create virtual table txfts using fts5(
+create virtual table txftsci using fts5(
   input,
   output,
   cid_hex,
-  -- tokenize = "unicode61"
   tokenize = "ascii"
-  -- tokenize=unicode61 "remove_diacritics=2" );
-  -- tokenize = 'unicode61'
   );
-  -- tokenize = 'porter ascii' );
 
+-- ---------------------------------------------------------------------------------------------------------
 .print '--=(3)=--'
-insert into txfts ( input, output, cid_hex ) select
+create virtual table txftscs using fts5(
+  input,
+  output,
+  cid_hex,
+  tokenize = "asciics"
+  );
+
+-- ---------------------------------------------------------------------------------------------------------
+.print '--=(4)=--'
+insert into txftsci ( input, output, cid_hex ) select
     texname,
     glyph,
     cid_hex
   from texnames;
 
-.print '--=(4)=--'
-insert into txfts ( input, output, cid_hex ) values
-  ( '日本',                                           'japanese', 'xxx' ),
-  ( '日本語',                                        'japanese', 'xxx' ),
-  ( 'これは日本語で書かれています',                   'japanese', 'xxx' ),
-  ( ' これは　日本語の文章を 全文検索するテストです',   'japanese', 'xxx' );
-
--- optimize index:
+-- ---------------------------------------------------------------------------------------------------------
 .print '--=(5)=--'
--- insert into txfts ( txfts ) values ( 'optimize' );
-insert into txfts ( txfts ) values ( 'rebuild' );
+insert into txftscs ( input, output, cid_hex ) select
+    texname,
+    glyph,
+    cid_hex
+  from texnames;
 
-select count(*) from txfts;
+-- ---------------------------------------------------------------------------------------------------------
+-- optimize index:
+.print '--=(6)=--'
+-- insert into txftsci ( txftsci ) values ( 'optimize' );
+insert into txftsci ( txftsci ) values ( 'rebuild' );
+
+select count(*) from txftsci;
 
 -- ---------------------------------------------------------------------------------------------------------
 create table probes (
@@ -108,53 +79,96 @@ create table probes (
 
 -- ---------------------------------------------------------------------------------------------------------
 create table results (
-    probe_id  integer         not null,
-    result_id integer unique  not null,
+    pid       integer         not null,
+    rid       integer unique  not null,
     result    text            not null
   );
 
 -- ---------------------------------------------------------------------------------------------------------
 insert into probes ( probe ) values
+  -- ( 'a'   ),
+  -- ( 'e'   ),
   ( 'alpha'   ),
+  ( 'beta'   ),
+  -- ( 'alpha*'  ),
   ( 'Alpha'   ),
-  ( 'alpha*'  ),
-  ( 'Alpha*'  ),
+  -- ( 'Alpha*'  ),
+  -- ( 'arrow downwards'     ),
+  -- -- ( 'arrow%'              ),
+  -- ( 'greek letter alpha'  ),
+  -- ( 'greek letter Alpha'  ),
+  -- ( 'greek letter'       ),
+  -- ( 'down*'               ),
   ( '日本'      ),
   ( '日本*'     );
 
 select * from probes;
-.load './extensions/series'
-select * from generate_series( 1, 10, 3 ) as n;
+-- .exit
+
+.print '--=(7)=--'
+.print 'matching against txftsci'
+select
+    p.id                                        as pid,
+    row_number() over ( partition by p.id )     as rid,
+    p.probe                                     as probe,
+    t.input                                     as input,
+    t.output                                    as output,
+    t.rank                                      as rank
+  from
+    probes as p
+    join ( select
+        bm25( txftsci )     as rank,
+        output              as output,
+        input               as input,
+        cid_hex             as cid_hex
+      from txftsci ) as t
+    where t.input match p.probe
+    order by
+      pid,
+      rid,
+      t.rank;
+
+.print '--=(8)=--'
+.print 'matching against txftscs'
+select
+    p.id                                        as pid,
+    row_number() over ( partition by p.id )     as rid,
+    p.probe                                     as probe,
+    t.input                                     as input,
+    t.output                                    as output,
+    t.rank                                      as rank
+  from
+    probes as p
+    join ( select
+        bm25( txftscs )     as rank,
+        output              as output,
+        input               as input,
+        cid_hex             as cid_hex
+      from txftscs ) as t
+    where t.input match p.probe
+    order by
+      pid,
+      rid,
+      t.rank;
+
+.load './extensions/nextchar'
+-- select * from texnames where texname like 'a%';
+select next_char( 'a', 'texnames', 'texname' );
+select next_char( 'acute-', 'texnames', 'texname' );
+select next_char( '日', 'texnames', 'texname' );
+select next_char( 'で', 'texnames', 'texname' );
+
+.load './extensions/regexp'
+select 'another day at the races' regexp 'da';
+
+-- .load './extensions/series'
+-- select * from generate_series( 1, 10, 3 ) as n;
 
 .exit
 
-.print '============================================================================================================'
-select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match 'alpha' order by bm25( txfts );
+-- .print '============================================================================================================'
+-- select snippet( txftsci, -1, '[', ']', '*', 20 ), * from txftsci where input match '日本' order by bm25( txftsci );
 
-.print '============================================================================================================'
-select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match 'Alpha' order by bm25( txfts );
-
-.print '============================================================================================================'
-select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match 'alpha*' order by bm25( txfts );
-
-.print '============================================================================================================'
-select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match 'Alpha*' order by bm25( txfts );
-
-.print '============================================================================================================'
-select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match '日本' order by bm25( txfts );
-
-.print '============================================================================================================'
-select snippet( txfts, -1, '[', ']', '*', 20 ), * from txfts where input match '日本*' order by bm25( txfts );
-
-
-
--- -- select distinct output from txfts where input match 'arrow downwards';
--- -- select * from txfts where output match 'a';
--- -- select * from txfts where input match 'arrow%';
--- -- select matchinfo( txfts, 'y' ), * from txfts where input match 'greek letter alpha';
--- -- select snippet( txfts ), * from txfts where input match 'greek letter alpha';
--- -- select snippet( txfts ), * from txfts where input match 'greek -letter';
--- -- select snippet( txfts ), * from txfts where input match 'down*';
 
 
 -- -- drop view if exists unicode_entities_01;
