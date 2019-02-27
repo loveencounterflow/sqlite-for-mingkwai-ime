@@ -53,13 +53,13 @@ At present, very little, but hopefully handy stuff.
   embedded engine that is used by your app (at least that works for NodeJS apps that employ
   `better-sqlite3`); see [below](#using-this-edition-of-sqlite-in-better-sqlite3).
 
-**The great bonus in using your own copy of the SQLite Amalgamation—whether you want a run-of-the-mill
-version of SQLite or a heavily modified beast—lies in the opportunity of being able to work with binaries
-compiled from the same identical sources**. That is, where before you would use the standard SQLite3
-installation of your favorite OS (which for Ubuntu would be SQLite v3.22.0 as of 2019-02-27) for the command
-line and the default SQLite3 version as provided by the SQLite engine of your choice (that would be SQLite
-v3.26.0 for `better-sqlite3` as of 2019-02-27)—which may differ in quite a few subtle ways—you can now
-confidently rely on a set version for both uses.
+	**The great bonus in using your own copy of the SQLite Amalgamation—whether you want a run-of-the-mill
+	version of SQLite or a heavily modified beast—lies in the opportunity of being able to work with binaries
+	compiled from the same identical sources**. That is, where before you would use the standard SQLite3
+	installation of your favorite OS (which for Ubuntu would be SQLite v3.22.0 as of 2019-02-27) for the
+	command line and the default SQLite3 version as provided by the SQLite engine of your choice (that would
+	be SQLite v3.26.0 for `better-sqlite3` as of 2019-02-27)—which may differ in quite a few subtle ways—you
+	can now confidently rely on a set version for both uses.
 
 * For doing full text search within SQLite, it is necessary to first tokenize text. It turns out that all
   [tokenizers provided by SQLite](https://www.sqlite.org/fts5.html#tokenizers) do unconditional case folding
