@@ -41,6 +41,14 @@ At present, very little, but hopefully handy stuff.
 	thread](https://www.mail-archive.com/sqlite-users@mailinglists.sqlite.org/msg93715.html) but how on Earth
 	is one supposed to find this tidbit?
 
+* The incantation to compile an SQLite extension is much more mundaner:
+
+	```
+	gcc -g -fPIC -shared -I. extension-sources/misc/amatch.c -o extensions/amatch.so
+	```
+
+	and so on, one line for each extension.
+
 * You can (fork, modify and) use the present repo both for a custom SQLite command line prompt *and* the
   embedded engine that is used by your app (at least that works for NodeJS apps that employ
   `better-sqlite3`); see [below](#using-this-edition-of-sqlite-in-better-sqlite3).
@@ -52,6 +60,17 @@ installation of your favorite OS (which for Ubuntu would be SQLite v3.22.0 as of
 line and the default SQLite3 version as provided by the SQLite engine of your choice (that would be SQLite
 v3.26.0 for `better-sqlite3` as of 2019-02-27)—which may differ in quite a few subtle ways—you can now
 confidently rely on a set version for both uses.
+
+* For doing full text search within SQLite, it is necessary to first tokenize text. It turns out that all
+  [tokenizers provided by SQLite](https://www.sqlite.org/fts5.html#tokenizers) do unconditional case folding
+  (i.e. all occurrences of `WORDS`, `WordS`, `words` and so on are considered equivalent and turned to
+  all-lowercase `words`). This is what you want most of the time, but not all of the time. Using very
+  primitive tools (read: I copied the relevant source, renamed all the stuff to avoid name collisions and
+  out-commented a single line) I managed to produce a new tokenizer, `asciics` ('ASCII Case-Sensitive') that
+  skips case folding (see
+  [`tests/fts4-ascii-non-folding-tokenizer.sql`](https://github.com/loveencounterflow/sqlite-for-mingkwai-ime/blob/master/tests/fts4-ascii-non-folding-tokenizer.sql)
+  for a demo). Needless to say, this {c|sh}ould be turned into a tokenizer option and be refactored to avoid
+  the code duplication. Think of it as a proof of concept.
 
 ## Using this edition of SQLite in `better-sqlite3`
 
