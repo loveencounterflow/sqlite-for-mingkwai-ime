@@ -72,6 +72,9 @@ confidently rely on a set version for both uses.
   for a demo). Needless to say, this {c|sh}ould be turned into a tokenizer option and be refactored to avoid
   the code duplication. Think of it as a proof of concept.
 
+  > The demo can be run as `rm tests/test.db ; ./sqlite3-27-902 tests/test.db <
+  > tests/fts4-ascii-non-folding-tokenizer.sql`; this will probably change ITF.
+
 ## Using this edition of SQLite in `better-sqlite3`
 
 To use this version of the SQLite engine with NodeJS and [`better-sqlite3`](https://github.com/JoshuaWise),
