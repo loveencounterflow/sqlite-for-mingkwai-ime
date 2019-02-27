@@ -34,7 +34,7 @@ At present, very little, but hopefully handy stuff.
 	```
 
 	which is a mouthful. The least part of it, `-lm`, turned out to be essential in conjunction with the
-	`-DSQLITE_ENABLE_FTS5` switch that enables Full Test Search v5 functionality; without it, the source
+	`-DSQLITE_ENABLE_FTS5` switch that enables Full Text Search v5 functionality; without it, the source
 	reference to the `log()` (logarithm) function necessary for FTS5 throws the compiler off (I gather it is
 	to mean 'include `-l`ibrary for doing `m`ath' but as far as I'm concerned I'm just throwing magic sticks
 	in the hope they will assemble to something useful). This is mentioned in a [mailing list
