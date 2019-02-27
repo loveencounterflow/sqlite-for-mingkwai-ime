@@ -10,8 +10,36 @@ with select options, extensions, and added features.
 
 At present, very little, but hopefully handy stuff.
 
-* There is a bash script to compile the SQLite engine itself; this produces an executable for the SQLite
-  command line utility that knows about all the (very little) changes to SQLite that are made here.
+* There is a bash script (`./build.sh`) to compile the SQLite engine itself; this produces an executable for
+  the SQLite command line utility that knows about all the (very little) changes to SQLite that are made
+  here.
+
+* There is another bash script (`./build-extensions.sh`) to build a number of extensions (basically, those
+  included in
+  [https://www.sqlite.org/cgi/src/.../misc](https://www.sqlite.org/cgi/src/dir?ci=29d02bf2fa9ecacb&name=ext/misc);
+  refer to https://www.sqlite.org/cgi/src/doc/trunk/README.md or https://www.sqlite.org/src/zip/sqlite.zip
+  to download a current version). This can then be dynamically loaded from a SQL script using the
+  `.load 'path/to/extension'` directive. Given a took me some time of wading through a considerable number
+  of web pages to pull all of these details together, the current repo may save you some time.
+
+* You may want to take a gander at the compilation incantations in the bash scripts. For the main part,
+	that is
+
+	```
+	gcc -Os -I. -DSQLITE_THREADSAFE=0 -DSQLITE_ENABLE_FTS4 \
+	   -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
+	   -DSQLITE_ENABLE_RTREE -DSQLITE_ENABLE_EXPLAIN_COMMENTS \
+	   -DHAVE_USLEEP -DHAVE_READLINE \
+	   shell.c sqlite3.c -ldl -lm -lreadline -lncurses -o "$targetname"
+	```
+
+	which is a mouthful. The least part of it, `-lm`, turned out to be essential in conjunction with the
+	`-DSQLITE_ENABLE_FTS5` switch that enables Full Test Search v5 functionality; without it, the source
+	reference to the `log()` (logarithm) function necessary for FTS5 throws the compiler off (I gather it is
+	to mean 'include `-l`ibrary for doing `m`ath' but as far as I'm concerned I'm just throwing magic sticks
+	in the hope they will assemble to something useful). This is mentioned in a [mailing list
+	thread](https://www.mail-archive.com/sqlite-users@mailinglists.sqlite.org/msg93715.html) but how on Earth
+	is one supposed to find this tidbit?
 
 * You can (fork, modify and) use the present repo both for a custom SQLite command line prompt *and* the
   embedded engine that is used by your app (at least that works for NodeJS apps that employ
