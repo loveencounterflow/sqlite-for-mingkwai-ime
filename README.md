@@ -15,7 +15,7 @@ At present, very little, but hopefully handy stuff.
 
 * You can (fork, modify and) use the present repo both for a custom SQLite command line prompt *and* the
   embedded engine that is used by your app (at least that works for NodeJS apps that employ
-  `better-sqlite3`).
+  `better-sqlite3`); see [below](#using-this-edition-of-sqlite-in-better-sqlite3).
 
 **The great bonus in using your own copy of the SQLite Amalgamation—whether you want a run-of-the-mill
 version of SQLite or a heavily modified beast—lies in the opportunity of being able to work with binaries
