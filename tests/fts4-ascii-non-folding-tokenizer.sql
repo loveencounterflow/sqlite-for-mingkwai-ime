@@ -151,44 +151,10 @@ select
       rid,
       t.rank;
 
-.load './extensions/nextchar'
--- select * from texnames where texname like 'a%';
-select next_char( 'a', 'texnames', 'texname' );
-select next_char( 'acute-', 'texnames', 'texname' );
-select next_char( '日', 'texnames', 'texname' );
-select next_char( 'で', 'texnames', 'texname' );
-
-.load './extensions/regexp'
-select 'another day at the races' regexp 'da';
-
 -- .load './extensions/series'
 -- select * from generate_series( 1, 10, 3 ) as n;
 
 .exit
-
--- .print '============================================================================================================'
--- select snippet( txftsci, -1, '[', ']', '*', 20 ), * from txftsci where input match '日本' order by bm25( txftsci );
-
-
-
--- -- drop view if exists unicode_entities_01;
--- -- create view unicode_entities_01 as select
--- --     ID                      as ID,
--- --     "UNICODE DESCRIPTION"   as uname,
--- --     Entity                  as entity,
--- --     -- mode                    as mode,
--- --     -- type                    as type,
--- --     -- replace( latex, char( 92 ), '' )                   as latex
--- --     replace( latex, char( 0x5c ), '' )                   as latex
--- --     -- category                as category,
--- --     -- "op dict"               as "op dict",
--- --   from unicode_entities
--- --   -- order by "UNICODE DESCRIPTION"
--- --   order by latex desc
--- --   ;
-
--- -- select * from unicode_entities_01  limit 100; select count(*) from unicode_entities_01;
-
 
 
 
