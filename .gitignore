@@ -3,5 +3,6 @@
 sqlite3-*
 extensions/*
 tests/test.db
+experiments/amatch.db
 
 
