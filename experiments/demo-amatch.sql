@@ -59,7 +59,7 @@ insert into vocabulary ( word ) values ( 'dogs'         );
 insert into vocabulary ( word ) values ( 'learn'         );
 insert into vocabulary ( word ) values ( 'stealth'         );
 insert into vocabulary ( word ) values ( 'health'         );
-insert into vocabulary ( word ) values ( 'wether'         );
+insert into vocabulary ( word ) values ( 'weather'         );
 insert into vocabulary ( word ) values ( 'whether'         );
 
 -- ---------------------------------------------------------------------------------------------------------
@@ -111,7 +111,8 @@ select
     -- and ( word match 'bath' )
     -- and ( word match 'kat' )
     -- and ( word match 'laern' )
-    and ( word match 'wheather' )
+    -- and ( word match 'wheather' )
+    and ( word match 'waether' )
     ;
 
 
