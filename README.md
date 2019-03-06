@@ -78,15 +78,16 @@ At present, very little, but hopefully handy stuff.
 ## Using this edition of SQLite in `better-sqlite3`
 
 To use this version of the SQLite engine with NodeJS and [`better-sqlite3`](https://github.com/JoshuaWise),
-just npm-install it with the path to this repo added as value of the `--sqlite3` switch. To quote [the
-manual](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/compilation.md):
+just npm-install it with the path to this repo added as value of the `--sqlite3` switch. In order for the
+compiler to find `#include`d files, one should set the environment variable `C_INCLUDE_PATH` to the
+same value as the `--sqlite3` switch:
 
-> If you want to use a customized version of SQLite3 with `better-sqlite3`, you can do so by specifying the
-> directory of your custom amalgamation during installation.
->
-> `npm install --sqlite3=/my/path/to/sqlite-amalgamation`
->
-> Your amalgamation directory should contain sqlite3.c and sqlite3.h. Any desired compile time options must
-> be defined directly within sqlite3.c.
+```
+C_INCLUDE_PATH="path/to/sqlite-amalgamation" npm install better-sqlite3 --sqlite3="path/to/sqlite-amalgamation"
+```
+
+**Observe that when you perform an update to your `better-sqlite3` dependency, you will have to
+repeat the above command line.**
+
 
 
