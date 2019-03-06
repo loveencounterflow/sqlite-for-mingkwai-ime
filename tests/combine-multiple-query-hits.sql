@@ -52,8 +52,25 @@ create table queries (
     query   text not null );
 
 create table query_id (
-    id        integer,
-    query_id  integer );
+    id        integer unique,
+    query_id  integer,
+  check ( id = 1 ) );
+insert into query_id values ( 1, null );
+
+-- a history of queries:
+insert into queries ( query ) values
+  ( 'iota' ),
+  ( 'Iota' ),
+  ( 'alpha' ),
+  ( 'Alpha' ),
+  ( 'beta' ),
+  ( 'Beta' );
+
+
+.print '--=(8)=--'
+-- upsert a query ID into `query_id.query_id` makes the select statement find the current query:
+insert into query_id values ( 1, 2 ) on conflict ( id ) do update set query_id = excluded.query_id;
+select qs.query from queries as qs where qs.id = ( select query_id from query_id where id = 1 );
 
 
 -- .print '--=(7)=--'
@@ -62,7 +79,9 @@ create view matches_ci as select
     'txftsci'           as source,
     bm25( txftsci )     as rank
   from txftsci as t
-  where t.input match 'Alpha';
+  where t.input match (
+    select qs.query from queries as qs where qs.id = ( select query_id from query_id where id = 1 )
+    );
 
 -- .print '--=(8)=--'
 create view matches_cs as select
@@ -70,7 +89,9 @@ create view matches_cs as select
     'txftscs'           as source,
     bm25( txftscs )     as rank
   from txftscs as t
-  where t.input match 'Alpha';
+  where t.input match (
+    select qs.query from queries as qs where qs.id = ( select query_id from query_id where id = 1 )
+    );
 
 -- .print '--=(9)=--'
 create view matches_union as
@@ -97,13 +118,6 @@ create view matches_union_counts as with v1 as ( select
     from v1
     where rnr = 1;
 
-.print '============================================================================================================='
-insert into queries ( query ) values
-  ( 'alpha' ),
-  ( 'Alpha' ),
-  ( 'beta' ),
-  ( 'Beta' );
-select * from queries;
 
 .print '============================================================================================================='
 select * from matches_union_counts order by count desc, rank asc;
